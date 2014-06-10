@@ -166,6 +166,8 @@ format_boot () {
 
 format_root () {
 	mkfs.ext4 ${destination}p2 -L rootfs
+	mkfs.ext4 ${destination}p3 -L rootfs2
+	mkfs.ext4 ${destination}p4 -L data
 	flush_cache
 }
 
@@ -190,6 +192,8 @@ partition_drive () {
 	#96Mb fat formatted boot partition
 	LC_ALL=C sfdisk --force --in-order --Linux --unit M "${destination}" <<-__EOF__
 		1,96,0xe,*
+		,600,,-
+		,600,,-
 		,,,-
 	__EOF__
 
