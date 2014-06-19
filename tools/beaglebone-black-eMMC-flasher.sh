@@ -239,7 +239,7 @@ copy_rootfs () {
 	mount ${destination}p2 /tmp/rootfs/ -o async,noatime
 
 	echo "rsync: / -> /tmp/rootfs/"
-	rsync -aAX /* /tmp/rootfs/ --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found,/boot/*,/lib/modules/*} || write_failure
+	rsync -aAX /* /tmp/rootfs/ --exclude={/dev/*,/proc/*,/sys/*,/tmp/*,/run/*,/mnt/*,/media/*,/lost+found,/boot/*,/lib/modules/*,/var/opt/elma/*} || write_failure
 	flush_cache
 
 	if [ -f /tmp/rootfs/opt/scripts/images/beaglebg.jpg ] ; then
@@ -277,6 +277,13 @@ copy_rootfs () {
 	echo "debugfs         /sys/kernel/debug  debugfs  defaults          0  0" >> /tmp/rootfs/etc/fstab
 	flush_cache
 	umount /tmp/rootfs/ || umount -l /tmp/rootfs/ || write_failure
+
+	mkdir -p /tmp/datafs/ || true
+	mount ${destination}p4 /tmp/datafs/ -o async,noatime
+
+	echo "rsync: /var/opt/elma/ -> /tmp/datafs/"
+	rsync -aAX /var/opt/elma/* /tmp/datafs/  || write_failure
+	flush_cache
 
 	#https://github.com/beagleboard/meta-beagleboard/blob/master/contrib/bone-flash-tool/emmc.sh#L158-L159
 	# force writeback of eMMC buffers
